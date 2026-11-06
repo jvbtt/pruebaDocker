@@ -1,0 +1,40 @@
+services:
+  # 1. Servicio del Motor de Base de Datos MySQL (Usuario: root | Sin contraseña)
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: proyecto_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_datos:/var/lib/mysql
+    networks:
+      - red-desarrollo
+
+  # 2. Servicio de Administración Web phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin-ui
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root          # <-- Opcional: hace que entre automático con root
+      PMA_PASSWORD: ""        # <-- Sin contraseña
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8080:80"
+    networks:
+      - red-desarrollo
+
+volumes:
+  mysql_datos:
+
+networks:
+  red-desarrollo:
+    driver: bridge
